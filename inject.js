@@ -1,4 +1,15 @@
-(function init() {
+if (!window.xtHelperBtn) {
+    window.xtHelperBtn = createXtHelperBtn();
+}
+if (!window.domObserver) {
+    window.domObserver = new DomObserver();
+}
+if (!window.flashBox) {
+    window.flashBox = new FlashBox();
+}
+
+
+function createXtHelperBtn() {
     let prev = document.createElement('button');
     prev.className = "xt-helper-btn-prev"
     prev.innerText = "<<";
@@ -13,6 +24,8 @@
                 ind = i; break;
             }
         }
+        // Activate Dom Observer
+        window.domObserver.observe();
         spans[--ind].click();
     });
 
@@ -21,7 +34,7 @@
     next.innerText = ">>";
     next.style.height = "20px";
     next.style.width = "30px";
-    next.addEventListener('click', function () {
+    next.addEventListener('click', async function () {
         let spans = document.getElementsByClassName("noScore");
         let ind;
         for (let i = 0; i < spans.length; i++) {
@@ -29,6 +42,8 @@
                 ind = i; break;
             }
         }
+        // Activate Dom Observer
+        window.domObserver.observe();
         spans[++ind].click();
     });
 
@@ -53,46 +68,54 @@
         btnGroup.style[e] = btnGroupStyle[e];
     })
 
-    let targetNode = document.getElementsByClassName('lesson_rightcon')[0];//content监听的元素id
-    //options：监听的属性
-    let options = { childList: true, subtree: true };
-    //回调事件
-    function callback(mutationsList, observer) {
+    return btnGroup;
+}
+
+// Class DomObserver
+function DomObserver() {
+    this.element = document.getElementsByClassName('lesson_rightcon')[0];
+    this.options = { childList: true, subtree: true };
+
+    this.callback = function (mutationsList, obs) {
         for (let i in mutationsList) {
             let record = mutationsList[i];
             if (record.type == 'childList' &&
                 record.target.className == 'xt_video_player_fullscreen fr') {
                 record.target.click();
-                v = document.getElementById('btn-group');
+                let v = document.getElementById('xt-helper-btn');
                 if (!v) {
                     try {
                         v = document.getElementsByTagName('video')[0]
-                        v.parentNode.insertBefore(btnGroup, v);
+                        v.parentNode.insertBefore(xtHelperBtn, v);
+                        // Disconnect Observer after xtHelperBtn inserted
+                        obs.disconnect();
                     } catch (err) {
                     }
                 }
                 return;
             }
         }
-    }
-    let mutationObserver = new MutationObserver(callback);
-    mutationObserver.observe(targetNode, options);
+    };
+
+    this.observer = new MutationObserver(this.callback);
+
+    this.observe = function () {
+        this.observer.observe(this.element, this.options);
+    };
+
+    this.disconnect = function () {
+        this.observer.disconnect();
+    };
+}
 
 
-    function insertXtHelperBtn() {
-        if (document.getElementById('xt-helper-btn')) return false;
-        let v = document.getElementsByTagName('video')[0]
-        if (v)
-            v.parentNode.insertBefore(btnGroup, v);
-    }
+// Class FlashBox
+function FlashBox() {
+    this.flashDiv = document.createElement('div');
 
-    insertXtHelperBtn();
-
-    let flash = document.createElement('div');
-    flash.innerText = "开启成功";
-
-    let flashStyle = {
-        width: "200px",
+    let flashDivStyle = {
+        paddingLeft: "50px",
+        paddingRight: "50px",
         height: "50px",
         lineHeight: "50px",
         fontSize: "26px",
@@ -107,13 +130,33 @@
         borderRadius: "5px"
     }
 
-    Object.keys(flashStyle).forEach((e) => {
-        flash.style[e] = flashStyle[e];
-    })
+    Object.keys(flashDivStyle).forEach((e) => {
+        this.flashDiv.style[e] = flashDivStyle[e];
+    });
 
-    document.getElementsByTagName('body')[0].appendChild(flash);
-    setTimeout(() => {
-        document.getElementsByTagName('body')[0].removeChild(flash);
-    }, 1000);
-})();
+    this.flash = function (message, time = 1000) {
+        this.flashDiv.innerText = message;
+        document.getElementsByTagName('body')[0].appendChild(this.flashDiv);
+        setTimeout(() => {
+            document.getElementsByTagName('body')[0].removeChild(this.flashDiv);
+        }, time);
+    }
+}
 
+function insertXtHelperBtn() {
+    if (document.getElementById('xt-helper-btn')) return true;
+    let v = document.getElementsByTagName('video')[0]
+    if (v) {
+        v.parentNode.insertBefore(xtHelperBtn, v);
+        return true;
+    }
+    return false;
+}
+
+function init() {
+    if (!insertXtHelperBtn())
+        domObserver.observe();
+    flashBox.flash("开启成功");
+}
+
+init();

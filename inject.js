@@ -1,5 +1,5 @@
-if (!window.xtHelperBtn) {
-    window.xtHelperBtn = createXtHelperBtn();
+if (!window.xtAssistBtn) {
+    window.xtAssistBtn = createXtAssistBtn();
 }
 if (!window.domObserver) {
     window.domObserver = new DomObserver();
@@ -7,13 +7,24 @@ if (!window.domObserver) {
 if (!window.flashBox) {
     window.flashBox = new FlashBox();
 }
+if (!window.xtAssistSettings) {
+    window.xtAssistSettings = loadXtAssistSettings();
+}
+
+function loadXtAssistSettings() {
+    return {
+        playbackRate: 1.0,
+    }
+}
 
 
-function createXtHelperBtn() {
+function createXtAssistBtn() {
+
+    // Previous Button
     let prev = document.createElement('button');
     prev.className = "xt-helper-btn-prev"
     prev.innerText = "<<";
-    prev.style.height = "20px";
+    prev.style.height = "30px";
     prev.style.width = "30px";
 
     prev.addEventListener('click', function () {
@@ -24,15 +35,19 @@ function createXtHelperBtn() {
                 ind = i; break;
             }
         }
-        // Activate Dom Observer
-        window.domObserver.observe();
+        // Record settings
+        let video = document.getElementsByTagName('video')[0];
+        if (video) xtAssistSettings.playbackRate = video.playbackRate;
+
         spans[--ind].click();
     });
 
+
+    // Next Button
     let next = document.createElement('button');
     next.className = "xt-helper-btn-next"
     next.innerText = ">>";
-    next.style.height = "20px";
+    next.style.height = "30px";
     next.style.width = "30px";
     next.addEventListener('click', async function () {
         let spans = document.getElementsByClassName("noScore");
@@ -42,22 +57,25 @@ function createXtHelperBtn() {
                 ind = i; break;
             }
         }
-        // Activate Dom Observer
-        window.domObserver.observe();
+        // Record settings
+        let video = document.getElementsByTagName('video')[0];
+        if (video) xtAssistSettings.playbackRate = video.playbackRate;
+
         spans[++ind].click();
     });
 
+    // Button Group
     let btnGroup = document.createElement('div')
     btnGroup.id = "xt-helper-btn";
     btnGroup.appendChild(prev);
     btnGroup.appendChild(next);
 
     let btnGroupStyle = {
-        height: "20px",
+        height: "30px",
         width: "80px",
         display: "flex",
         position: "absolute",
-        left: "50%",
+        right: "30px",
         top: "10px",
         transform: "translateX(-50%)",
         opacity: 0.5,
@@ -75,24 +93,27 @@ function createXtHelperBtn() {
 function DomObserver() {
     this.element = document.getElementsByClassName('lesson_rightcon')[0];
     this.options = { childList: true, subtree: true };
+    this.reload = false;
 
     this.callback = function (mutationsList, obs) {
         for (let i in mutationsList) {
             let record = mutationsList[i];
             if (record.type == 'childList' &&
                 record.target.className == 'xt_video_player_fullscreen fr') {
+
                 record.target.click();
                 let v = document.getElementById('xt-helper-btn');
-                if (!v) {
-                    try {
-                        v = document.getElementsByTagName('video')[0]
-                        v.parentNode.insertBefore(xtHelperBtn, v);
-                        // Disconnect Observer after xtHelperBtn inserted
-                        obs.disconnect();
-                    } catch (err) {
-                    }
+                let video = document.getElementsByTagName('video')[0];
+                if (!v && video) {
+                    video.parentNode.insertBefore(xtAssistBtn, video);
                 }
-                return;
+                if (video) {
+                    let handler = function () {
+                        this.playbackRate = xtAssistSettings.playbackRate;
+                        this.removeEventListener('play', handler);
+                    };
+                    video.addEventListener('play', handler);
+                }
             }
         }
     };
@@ -143,20 +164,24 @@ function FlashBox() {
     }
 }
 
-function insertXtHelperBtn() {
+function insertXtAssistBtn() {
     if (document.getElementById('xt-helper-btn')) return true;
     let v = document.getElementsByTagName('video')[0]
     if (v) {
-        v.parentNode.insertBefore(xtHelperBtn, v);
+        v.parentNode.insertBefore(xtAssistBtn, v);
         return true;
     }
     return false;
 }
 
 function init() {
-    if (!insertXtHelperBtn())
+    try {
         domObserver.observe();
-    flashBox.flash("开启成功");
+        insertXtAssistBtn();
+        flashBox.flash("开启成功");
+    } catch (err) {
+        flashBox.flash("失败" + err.toString());
+    }
 }
 
 init();

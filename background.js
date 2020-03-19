@@ -1,7 +1,11 @@
 'use strict';
 
 chrome.runtime.onInstalled.addListener(function () {
-    chrome.storage.local.set({ enabled: false, autoFullscreen: true }, function () {
+    chrome.storage.local.set({
+        enabled: false,
+        autoFullscreen: true,
+        autoSwitchpart: true
+    }, function () {
         console.log("Default: Disable.");
     });
 

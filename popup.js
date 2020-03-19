@@ -1,19 +1,21 @@
 let enableCheckbox = document.getElementById('enable-checkbox');
 let autoFullscreen = document.getElementById('auto-fullscreen');
+let autoSwitchpart = document.getElementById('auto-switchpart');
 
 // Check enable state
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     chrome.tabs.executeScript(tabs[0].id, {
-        code: `if (!window.domObserver) chrome.storage.local.set({ enabled: false });`
+        code: `if (!window.xtAssistEnableFlag) chrome.storage.local.set({ enabled: false });`
     }, () => {
-        chrome.storage.local.get(['enabled'], function (result) {
+        chrome.storage.local.get('enabled', function (result) {
             enableCheckbox.checked = result.enabled || false;
         });
     })
 });
 
-chrome.storage.local.get(['autoFullscreen'], function (result) {
+chrome.storage.local.get(['autoFullscreen', 'autoSwitchpart'], function (result) {
     autoFullscreen.checked = result.autoFullscreen || false;
+    autoSwitchpart.checked = result.autoSwitchpart || false;
 });
 
 // Event Listener for checkbox
@@ -34,5 +36,13 @@ autoFullscreen.onclick = function () {
         chrome.storage.local.set({ autoFullscreen: true });
     } else {
         chrome.storage.local.set({ autoFullscreen: false });
+    }
+}
+
+autoSwitchpart.onclick = function () {
+    if (autoSwitchpart.checked) {
+        chrome.storage.local.set({ autoSwitchpart: true });
+    } else {
+        chrome.storage.local.set({ autoSwitchpart: false });
     }
 }

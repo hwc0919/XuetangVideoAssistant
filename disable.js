@@ -1,5 +1,3 @@
-window.xtAssistEnableFlag = false;
-
 if (window.xtAssistBtn) {
     window.xtAssistBtn.remove();
 }

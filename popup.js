@@ -5,7 +5,7 @@ let autoSwitchpart = document.getElementById('auto-switchpart');
 // Check enable state
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     chrome.tabs.executeScript(tabs[0].id, {
-        code: `if (!window.xtAssistEnableFlag) chrome.storage.local.set({ enabled: false });`
+        file: "./check-enable.js"
     }, () => {
         chrome.storage.local.get('enabled', function (result) {
             enableCheckbox.checked = result.enabled || false;

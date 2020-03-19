@@ -8,7 +8,6 @@ if (!window.xtAssistSettings) {
     window.xtAssistSettings = loadXtAssistSettings();
 }
 
-window.xtAssistEnableFlag = false;
 window.allTitles = document.getElementsByClassName("titlespan noScore");
 
 Object.values(window.allTitles).forEach((title) => {
@@ -120,9 +119,11 @@ function DomObserver() {
                 // Caution: Sometimes auto fullscreen would fail with a warning:
                 // `API can only be initiated by a user gesture.`
                 chrome.storage.local.get('autoFullscreen', function (result) {
-                    if (result.autoFullscreen) setFullscreen();
-                    if (!record.target.classList.contains('xt_video_player_fullscreen_cancel'))
-                        flash("网页限制, 自动全屏失败", 2000);
+                    if (result.autoFullscreen) {
+                        setFullscreen();
+                        if (!record.target.classList.contains('xt_video_player_fullscreen_cancel'))
+                            flash("网页限制, 自动全屏失败", 3000);
+                    }
                 });
 
                 // Recover video speed
@@ -183,7 +184,7 @@ function FlashBox() {
         transform: "translateX(-50%)",
         zIndex: 100,
         background: "rgb(255, 255, 255)",
-        border: "1px solid gray",
+        border: "1px solid red",
         borderRadius: "5px",
         opacity: 0,
         transitionDuration: "0.5s"
@@ -203,7 +204,7 @@ function FlashBox() {
         let timer = setInterval(() => {
             if (v < 0.8) {
                 v += 0.1;
-                top += 1;
+                top += 2;
                 this.flashDiv.style.opacity = v;
                 this.flashDiv.style.top = top + "px";
             } else {
@@ -244,6 +245,7 @@ function changeVideoSrc(direction) {
     allTitles[ind + direction].click();
 }
 
+
 function setFullscreen() {
     let fullscreenBtn = document.getElementsByTagName('xt-fullscreenbutton')[0];
     if (fullscreenBtn && !fullscreenBtn.classList.contains('xt_video_player_fullscreen_cancel')) {
@@ -277,7 +279,6 @@ function init() {
     if (!window.domObserver.element) {
         flash("开启失败, 不在课程页面");
         delete window.domObserver;
-        window.xtAssistEnableFlag = false;
         return;
     }
     try {
@@ -291,10 +292,8 @@ function init() {
                 })
             };
         flash("开启成功");
-        window.xtAssistEnableFlag = true;
     } catch (err) {
         flash("开启失败");
-        window.xtAssistEnableFlag = false;
     }
 }
 

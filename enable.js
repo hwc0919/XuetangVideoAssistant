@@ -7,9 +7,16 @@ if (!window.domObserver || !window.domObserver.element) {
 if (!window.xtAssistSettings) {
     window.xtAssistSettings = loadXtAssistSettings();
 }
-if (!window.xtAssistEnableFlag) {
-    window.xtAssistEnableFlag = false;
-}
+
+window.xtAssistEnableFlag = false;
+window.allTitles = document.getElementsByClassName("titlespan noScore");
+
+Object.values(window.allTitles).forEach((title) => {
+    if (!title.onclick) title.onclick = function () {
+        let v = document.getElementsByTagName('video')[0];
+        if (v) xtAssistSettings.playbackRate = v.playbackRate;
+    }
+})
 
 
 function loadXtAssistSettings() {
@@ -31,9 +38,7 @@ function createXtAssistBtn() {
     prev.style.borderTopLeftRadius = "5px";
     prev.style.borderBottomLeftRadius = "5px";
 
-    prev.addEventListener('click', function () {
-        changeVideoSrc(-1);
-    });
+    prev.onclick = function () { changeVideoSrc(-1); };
 
     // Next Button
     let next = document.createElement('button');
@@ -45,9 +50,7 @@ function createXtAssistBtn() {
     next.style.borderTopRightRadius = "5px";
     next.style.borderBottomRightRadius = "5px";
 
-    next.addEventListener('click', function () {
-        changeVideoSrc(1);
-    });
+    next.onclick = function () { changeVideoSrc(1); };
 
     // Button Group
     let btnGroup = document.createElement('div')
@@ -98,9 +101,10 @@ function DomObserver() {
                 // `API can only be initiated by a user gesture.`
                 chrome.storage.local.get('autoFullscreen', function (result) {
                     if (result.autoFullscreen) {
-                        let fullscreenBtn = document.getElementsByTagName('xt-fullscreenbutton')[0];
-                        if (fullscreenBtn && !fullscreenBtn.classList.contains('xt_video_player_fullscreen_cancel'))
-                            fullscreenBtn.click();
+                        setFullscreen();
+                        let intv = setInterval(() => {
+                            if (setFullscreen() == false) clearInterval(intv);
+                        }, 400);
                     }
                 });
 
@@ -110,7 +114,6 @@ function DomObserver() {
                     video.onplay = function () {
                         video.onplay = null;
                         setTimeout(() => { // Make compatible to `VideoSpeedController Extension`
-                            console.log("rate: ", xtAssistSettings.playbackRate)
                             video.playbackRate = xtAssistSettings.playbackRate;
                         }, 200);
                     };
@@ -202,18 +205,43 @@ function flash(message, time) {
 
 
 function changeVideoSrc(direction) {
-    let spans = document.getElementsByClassName("noScore");
+    if (!window.allTitles || !allTitles.length)
+        window.allTitles = document.getElementsByClassName("titlespan noScore");
+
     let ind;
-    for (let i = 0; i < spans.length; i++) {
-        if (spans[i].parentNode.classList.contains("active")) {
+    for (let i = 0; i < allTitles.length; i++) {
+        if (allTitles[i].parentNode.classList.contains("active")) {
             ind = i; break;
         }
+    }
+    if (ind + direction < 0 || ind + direction >= allTitles.length) {
+        quitFullscreen();
+        flash("没有了!");
+        return;
     }
     // Record settings
     let video = document.getElementsByTagName('video')[0];
     if (video) xtAssistSettings.playbackRate = video.playbackRate;
 
-    spans[ind + direction].click();
+    allTitles[ind + direction].click();
+}
+
+
+function setFullscreen() {
+    let fullscreenBtn = document.getElementsByTagName('xt-fullscreenbutton')[0];
+    if (fullscreenBtn && !fullscreenBtn.classList.contains('xt_video_player_fullscreen_cancel')) {
+        fullscreenBtn.click(); return true;
+    }
+    return false;
+}
+
+
+function quitFullscreen() {
+    let fullscreenBtn = document.getElementsByTagName('xt-fullscreenbutton')[0];
+    if (fullscreenBtn && fullscreenBtn.classList.contains('xt_video_player_fullscreen_cancel')) {
+        fullscreenBtn.click(); return true;
+    }
+    return false;
 }
 
 

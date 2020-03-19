@@ -82,48 +82,58 @@ function DomObserver() {
     this.options = { childList: true, subtree: true };
     this.autoSwithLock = false;
     this.played = false;   // Auto switch part only if the video has ever been played.
+    let that = this;
 
     this.callback = function (mutationsList, obs) {
         for (let record of mutationsList) {
             if (record.type == 'childList' &&
                 record.target.tagName.toLowerCase() == 'xt-fullscreenbutton') {
-                // Caution: Sometimes auto fullscreen would fail with a warning:
-                // `API can only be initiated by a user gesture.`
-                if (!record.target.classList.contains('xt_video_player_fullscreen_cancel'))
-                    chrome.storage.local.get('autoFullscreen', function (result) {
-                        if (result.autoFullscreen) { record.target.click(); }
-                    });
 
                 // Insert xtAssistBtn again, if not exists
                 insertXtAssistBtn();
-                this.played = false;
+                that.played = false;
+
+                // Fullscreen
+                // Caution: Sometimes auto fullscreen would fail with a warning:
+                // `API can only be initiated by a user gesture.`
+                chrome.storage.local.get('autoFullscreen', function (result) {
+                    if (result.autoFullscreen) {
+                        let fullscreenBtn = document.getElementsByTagName('xt-fullscreenbutton')[0];
+                        if (fullscreenBtn && !fullscreenBtn.classList.contains('xt_video_player_fullscreen_cancel'))
+                            fullscreenBtn.click();
+                    }
+                });
 
                 // Recover video speed
                 let video = document.getElementsByTagName('video')[0];
                 if (video) {
-                    let onPlayHandler = function () {
-                        video.removeEventListener('play', onPlayHandler);
+                    video.onplay = function () {
+                        video.onplay = null;
                         setTimeout(() => { // Make compatible to `VideoSpeedController Extension`
+                            console.log("rate: ", xtAssistSettings.playbackRate)
                             video.playbackRate = xtAssistSettings.playbackRate;
                         }, 200);
                     };
-                    video.addEventListener('play', onPlayHandler);
-                    video.addEventListener('ended', () => {
-                        if (!this.played) return;
+                    video.onended = function () {
+                        if (!that.played) {
+                            video.currentTime = 0;  // Restart if already reach end
+                            video.play();
+                            return;
+                        }
                         chrome.storage.local.get('autoSwitchpart', (res) => {
                             if (res.autoSwitchpart) { setTimeout(() => { changeVideoSrc(1); }, 2000); }
                         })
-                    })
-                }
+                    };
+                } else flash("No video on page!")
                 return;
             } else if (record.type == 'childList' && record.target.className == 'white') {
                 // Set `this.played` to true if ever: curTime != totalTime
                 let curTimeSpan = record.target;
                 let totalTime = curTimeSpan.nextElementSibling.innerText;
-                if (curTimeSpan.innerText != totalTime) this.played = true;
-            } // end if
-        }; // end callback
-    }
+                if (curTimeSpan.innerText != totalTime) that.played = true;
+            }  // end if
+        };  // end for
+    }  // end callback
 
     this.observer = new MutationObserver(this.callback);
 
@@ -135,7 +145,6 @@ function DomObserver() {
         this.observer.disconnect();
     };
 }
-
 
 // Class FlashBox
 function FlashBox() {
@@ -229,6 +238,13 @@ function init() {
     try {
         domObserver.observe();
         insertXtAssistBtn();
+        let video = document.getElementsByTagName('video')[0];
+        if (video && !video.onended)
+            video.onended = function () {
+                chrome.storage.local.get('autoSwitchpart', (res) => {
+                    if (res.autoSwitchpart) { setTimeout(() => { changeVideoSrc(1); }, 1000); }
+                })
+            };
         flash("开启成功");
         window.xtAssistEnableFlag = true;
     } catch (err) {

@@ -1,14 +1,14 @@
 if (!window.xtAssistBtn) {
     window.xtAssistBtn = createXtAssistBtn();
 }
-if (!window.domObserver) {
+if (!window.domObserver || !window.domObserver.element) {
     window.domObserver = new DomObserver();
 }
 if (!window.xtAssistSettings) {
     window.xtAssistSettings = loadXtAssistSettings();
 }
 if (!window.xtAssistEnableFlag) {
-    window.xtAssistEnableFlag = true;
+    window.xtAssistEnableFlag = false;
 }
 
 
@@ -222,14 +222,18 @@ function insertXtAssistBtn() {
 function init() {
     if (!window.domObserver.element) {
         flash("开启失败, 不在课程页面");
+        delete window.domObserver;
+        window.xtAssistEnableFlag = false;
         return;
     }
     try {
         domObserver.observe();
         insertXtAssistBtn();
         flash("开启成功");
+        window.xtAssistEnableFlag = true;
     } catch (err) {
         flash("开启失败");
+        window.xtAssistEnableFlag = false;
     }
 }
 

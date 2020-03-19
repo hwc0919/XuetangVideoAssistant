@@ -4,16 +4,35 @@
 
 <head>
     <style>
-        button {
-            height: 30px;
-            width: 50px;
-            outline: none;
+        div.root {
+            width: 70px;
+        }
+
+        div.input-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 15px;
+            height: 15px;
         }
     </style>
 </head>
 
 <body>
-    <button id="enable-xt-helper">开启</button>
+    <div class="root">
+        <div class="input-group">
+            <label for="enable-checkbox">开启</label>
+            <input id="enable-checkbox" type="checkbox">
+        </div>
+        <div class="input-group">
+            <label for="auto-fullscreen">自动全屏</label>
+            <input id="auto-fullscreen" type="checkbox">
+        </div>
+    </div>
     <script src="popup.js"></script>
 </body>
 

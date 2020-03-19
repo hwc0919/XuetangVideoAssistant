@@ -102,12 +102,13 @@ function DomObserver() {
                 let video = document.getElementsByTagName('video')[0];
                 if (video) {
                     let onPlayHandler = function () {
-                        this.playbackRate = xtAssistSettings.playbackRate;
-                        this.removeEventListener('play', onPlayHandler);
+                        video.removeEventListener('play', onPlayHandler);
+                        setTimeout(() => { // Make compatible to `VideoSpeedController Extension`
+                            video.playbackRate = xtAssistSettings.playbackRate;
+                        }, 200);
                     };
                     video.addEventListener('play', onPlayHandler);
                     video.addEventListener('ended', () => {
-                        console.log(this.played);
                         if (!this.played) return;
                         chrome.storage.local.get('autoSwitchpart', (res) => {
                             if (res.autoSwitchpart) { setTimeout(() => { changeVideoSrc(1); }, 2000); }

@@ -32,7 +32,9 @@ function createXtAssistBtn() {
     let prev = document.createElement('button');
     prev.className = "xt-assist-btn-prev"
     prev.innerText = "<<";
+    prev.title = "上一集";
     prev.style.height = "26px";
+    prev.style.lineHeight = "24px";
     prev.style.width = "40px";
     prev.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
     prev.style.borderTopLeftRadius = "5px";
@@ -44,7 +46,9 @@ function createXtAssistBtn() {
     let next = document.createElement('button');
     next.className = "xt-assist-btn-next"
     next.innerText = ">>";
+    next.title = "下一集";
     next.style.height = "26px";
+    next.style.lineHeight = "24px";
     next.style.width = "40px";
     next.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
     next.style.borderTopRightRadius = "5px";
@@ -52,10 +56,26 @@ function createXtAssistBtn() {
 
     next.onclick = function () { changeVideoSrc(1); };
 
+    // Picture in Picture
+    let picInPic = document.createElement('button');
+    picInPic.className = "xt-assist-btn-picinpic"
+    picInPic.innerText = "O";
+    picInPic.title = "小窗模式";
+    picInPic.style.height = "26px";
+    picInPic.style.lineHeight = "24px";
+    picInPic.style.width = "25px";
+    picInPic.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+
+    picInPic.onclick = function () {
+        let video = document.getElementsByTagName('video')[0];
+        if (video) video.requestPictureInPicture();
+    };
+
     // Button Group
     let btnGroup = document.createElement('div')
     btnGroup.id = "xt-assist-btn";
     btnGroup.appendChild(prev);
+    btnGroup.appendChild(picInPic);
     btnGroup.appendChild(next);
 
     let btnGroupStyle = {
@@ -100,18 +120,16 @@ function DomObserver() {
                 // Caution: Sometimes auto fullscreen would fail with a warning:
                 // `API can only be initiated by a user gesture.`
                 chrome.storage.local.get('autoFullscreen', function (result) {
-                    if (result.autoFullscreen) {
-                        setFullscreen();
-                        let intv = setInterval(() => {
-                            if (setFullscreen() == false) clearInterval(intv);
-                        }, 400);
-                    }
+                    if (result.autoFullscreen) setFullscreen();
+                    if (!record.target.classList.contains('xt_video_player_fullscreen_cancel'))
+                        flash("网页限制, 自动全屏失败", 2000);
                 });
 
                 // Recover video speed
                 let video = document.getElementsByTagName('video')[0];
                 if (video) {
                     video.onplay = function () {
+
                         video.onplay = null;
                         setTimeout(() => { // Make compatible to `VideoSpeedController Extension`
                             video.playbackRate = xtAssistSettings.playbackRate;
@@ -175,7 +193,7 @@ function FlashBox() {
         this.flashDiv.style[e] = flashDivStyle[e];
     });
 
-    this.flash = function (message, time = 1000) {
+    this.flash = function (message, time) {
         this.flashDiv.innerText = message;
         document.getElementsByTagName('body')[0].appendChild(this.flashDiv);
 
@@ -199,7 +217,7 @@ function FlashBox() {
 }
 
 
-function flash(message, time) {
+function flash(message, time = 1000) {
     new FlashBox().flash(message, time);
 }
 
@@ -225,7 +243,6 @@ function changeVideoSrc(direction) {
 
     allTitles[ind + direction].click();
 }
-
 
 function setFullscreen() {
     let fullscreenBtn = document.getElementsByTagName('xt-fullscreenbutton')[0];

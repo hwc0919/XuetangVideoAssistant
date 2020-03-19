@@ -46,3 +46,10 @@ autoSwitchpart.onclick = function () {
         chrome.storage.local.set({ autoSwitchpart: false });
     }
 }
+
+
+let itag = document.getElementById('source-code');;
+itag.onclick = function () {
+    var newURL = "https://github.com/hwc0919/XuetangVideoAssistant";
+    chrome.tabs.create({ url: newURL });
+};

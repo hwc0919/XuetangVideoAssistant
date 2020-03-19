@@ -168,7 +168,7 @@ function FlashBox() {
 
         // FadeIn
         let v = 0;
-        let top = 50;
+        let top = 80;
         let timer = setInterval(() => {
             if (v < 0.8) {
                 v += 0.1;
@@ -219,12 +219,16 @@ function insertXtAssistBtn() {
 
 
 function init() {
+    if (!window.domObserver.element) {
+        flash("开启失败, 不在课程页面");
+        return;
+    }
     try {
         domObserver.observe();
         insertXtAssistBtn();
         flash("开启成功");
     } catch (err) {
-        flash("失败" + err.toString());
+        flash("开启失败");
     }
 }
 

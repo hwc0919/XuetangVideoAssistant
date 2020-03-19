@@ -16,7 +16,7 @@ You have to set your favorate video speed EVERY TIME you start a new one.
 #### 3. The video speed will stay the same as it is in the last video.
 
 ## How to use
-#### 1. Download zip file and unzip, or just clone the repository.
+#### 1. Download zip file and unzip, or clone the repository(update by pull anytime).
 #### 2. Chrome >> Settings >> Extionsions
 #### 3. Turn on `Developer mode` on the upper right corner.
 #### 4. Click `Load unpackec` and choose the folder you just unzipped (which includes a `manifest.json`).
@@ -30,7 +30,7 @@ You have to set your favorate video speed EVERY TIME you start a new one.
 #### 3. 视频速度会和切换分p之前保持一致, 不需要每次手动调整啦!
 
 ## 如何使用
-#### 1. 下载zip文件并解压, 或直接克隆仓库.
+#### 1. 下载zip文件并解压, 或直接克隆仓库(可随时通过pull更新).
 #### 2. Chrome >> 设置 >> 扩展程序
 #### 3. 右上角打开 `开发者模式`
 #### 4. 点击 `加载已解压的扩展程序`, 选择刚刚解压的文件夹(含有`manifest.json`文件的文件夹).
@@ -39,10 +39,10 @@ You have to set your favorate video speed EVERY TIME you start a new one.
 
 
 
-<br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 悄悄话: 
 
-世人苦学堂久矣! 架构不行服务器也差就算了, 人机交互也做的不敢恭维.
+世人苦学堂久矣! 架构不行服务器也差就算了, 用户交互也做的不敢恭维.
 
 B站可以设置自动换p, 为什么学堂还要退出全屏才能换呢. 这个功能实现起来也并不复杂吧.
 

@@ -19,12 +19,46 @@
             width: 15px;
             height: 15px;
         }
+
+        i {
+            position: absolute;
+            left: 5px;
+            cursor: pointer;
+        }
+
+        @keyframes shake {
+            10% {
+                transform: rotate(-10deg);
+            }
+
+            20% {
+                transform: rotate(10deg);
+            }
+
+            40% {
+                transform: rotate(-5deg);
+            }
+
+            60% {
+                transform: rotate(5deg);
+            }
+        }
+
+        i:hover {
+            animation: shake 1s;
+        }
+
+        img {
+            width: 20px;
+            height: 20px;
+        }
     </style>
 </head>
 
 <body>
     <div class="root">
         <div class="input-group">
+            <i id="source-code"><img src="images/head.jpg"></i>
             <label for="enable-checkbox">开启</label>
             <input id="enable-checkbox" type="checkbox">
         </div>

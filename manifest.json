@@ -16,17 +16,11 @@
     "page_action": {
         "default_popup": "popup.html",
         "default_icon": {
-            "16": "images/head16.png",
-            "32": "images/head32.png",
-            "48": "images/head48.png",
-            "128": "images/head128.png"
+            "80": "images/logo.png"
         }
     },
     "icons": {
-        "16": "images/head16.png",
-        "32": "images/head32.png",
-        "48": "images/head48.png",
-        "128": "images/head128.png"
+        "80": "images/logo.png"
     },
     "manifest_version": 2
 }

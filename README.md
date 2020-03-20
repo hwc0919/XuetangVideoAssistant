@@ -12,8 +12,10 @@ You have to set your favorate video speed EVERY TIME you start a new one.
 
 ## This Chrome Extension can help you fix them!
 #### 1. Provide hover buttons, you can switch video without quiting fullscreen mode.
-#### 2. After switching to next or previous video, the fullscreen mode will automatically turned on.
-#### 3. The video speed will stay the same as it is in the last video.
+#### 2. You can choose whether to auto-switch after video ended.
+#### 3. You can choose whether to auto-fullscreen after switching video.
+#### 4. The video speed will stay the same as it is in the last video.
+#### 5. Provide picture-in-picture mode!
 
 ## How to use
 #### 1. Download zip file and unzip, or clone the repository(update by pull anytime).
@@ -23,11 +25,16 @@ You have to set your favorate video speed EVERY TIME you start a new one.
 #### 5. Go to https://next.xuetangx.com/, choose a course, and click the extension icon.
 #### 6. Please leave a star
 
+## Problems
+Due to browser security consideration, it might fail to auto-fullscreen after auto-switching. 
+
 
 ## 帮你解决
 #### 1. 提供悬浮按钮, 你可以在不退出全屏的情况下, 向前或向后切换分p.
-#### 2. 视频切换后, 会自动回到全屏模式.
-#### 3. 视频速度会和切换分p之前保持一致, 不需要每次手动调整啦!
+#### 2. 可以设置视频播放结束后是否自动切换下一集.
+#### 3. 视频切换后, 可以设置是否自动开启全屏模式.
+#### 4. 视频速度会和切换分p之前保持一致, 不需要每次手动调整啦!
+#### 5. 可以开启画中画(悬浮窗口)模式!
 
 ## 如何使用
 #### 1. 下载zip文件并解压, 或直接克隆仓库(可随时通过pull更新).
@@ -36,6 +43,10 @@ You have to set your favorate video speed EVERY TIME you start a new one.
 #### 4. 点击 `加载已解压的扩展程序`, 选择刚刚解压的文件夹(含有`manifest.json`文件的文件夹).
 #### 5. 前往 https://next.xuetangx.com/, 进入任意一门课程, 点击小程序图标并`开启`
 #### 6. 点个赞吧
+
+
+## 问题说明
+自动换集之后自动全屏可能失败, 这是由于浏览器出于安全考虑禁止代码控制全屏. 但是手动换集之后的自动全屏不受影响.
 
 
 

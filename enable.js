@@ -8,8 +8,11 @@ if (!window.xtAssistSettings) {
     window.xtAssistSettings = loadXtAssistSettings();
 }
 
+window.timeoutLock = null;
 window.allTitles = document.getElementsByClassName("titlespan noScore");
 
+
+// Record current playbackRate when clicking on menu.
 Object.values(window.allTitles).forEach((title) => {
     if (!title.onclick) title.onclick = function () {
         let v = document.getElementsByTagName('video')[0];
@@ -111,9 +114,9 @@ function DomObserver() {
             if (record.type == 'childList' &&
                 record.target.tagName.toLowerCase() == 'xt-fullscreenbutton') {
 
+                that.played = false;
                 // Insert xtAssistBtn again, if not exists
                 insertXtAssistBtn();
-                that.played = false;
 
                 // Fullscreen
                 // Caution: Sometimes auto fullscreen would fail with a warning:
@@ -143,12 +146,15 @@ function DomObserver() {
                             return;
                         }
                         chrome.storage.local.get('autoSwitchpart', (res) => {
-                            if (res.autoSwitchpart) { setTimeout(() => { changeVideoSrc(1); }, 2000); }
+                            if (res.autoSwitchpart) {
+                                window.timeoutLock = setTimeout(() => {
+                                    xtAssistBtn.children[2].click();
+                                }, 1000);
+                            }
                         })
                     };
                 } else flash("No video on page!")
-                return;
-            } else if (record.type == 'childList' && record.target.className == 'white') {
+            } else if (!that.played && record.type == 'childList' && record.target.className == 'white') {
                 // Set `this.played` to true if ever: curTime != totalTime
                 let curTimeSpan = record.target;
                 let totalTime = curTimeSpan.nextElementSibling.innerText;
@@ -224,6 +230,7 @@ function flash(message, time = 1000) {
 
 
 function changeVideoSrc(direction) {
+    clearTimeout(window.timeoutLock);   // Avoid double switching
     if (!window.allTitles || !allTitles.length)
         window.allTitles = document.getElementsByClassName("titlespan noScore");
 
